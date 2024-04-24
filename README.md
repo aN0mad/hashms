@@ -2,8 +2,8 @@
 
 hashms runs during a hashcat cracking session and checks the given outfile (-o/--outfile parameter in hashcat) at specified intervals. If the outfile has additional lines (i.e. additional hashes have been cracked) hashms sends a notification via SMS and/or Slack and/or Teams. The intent is to reduce the delay between cracking a hash and follow-on operations, as well as the manual effort involved in checking and re-checking ongoing cracking sessions.
 
-hashms uses [Textbelt](https://textbelt.com/) for SMS. An API key is required for SMS, and a [Slack webhook URL](https://api.slack.com/incoming-webhooks) is required for Slack messages, a 
-[Teams webhook URL](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=newteams%2Cdotnet).
+hashms uses [Textbelt](https://textbelt.com/) for SMS. An API key is required for SMS, and a [Slack webhook URL](https://api.slack.com/incoming-webhooks) is required for Slack messages, and a 
+[Teams webhook URL](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=newteams%2Cdotnet) is required for Teams messages.
 
 ## Installation
 
