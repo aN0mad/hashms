@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "hashms"
+version = "1.0.0"
+description = "Monitor hashcat output files and send notification when hashes are cracked."
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+packages = [
+    { include = "hashms"},
+]
+
+[tool.poetry.scripts]
+hashms = 'hashms.hashms:main'
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pymsteams = "^0.2.2"
+requests = "^2.31.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

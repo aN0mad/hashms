@@ -1,47 +1,68 @@
 # hashms
 
-hashms runs during a hashcat cracking session and checks the given outfile (-o/--outfile parameter in hashcat) at specified intervals. If the outfile has additional lines (i.e. additional hashes have been cracked) hashms sends a notification via SMS and/or Slack. The intent is to reduce the delay between cracking a hash and follow-on operations, as well as the manual effort involved in checking and re-checking ongoing cracking sessions.
+hashms runs during a hashcat cracking session and checks the given outfile (-o/--outfile parameter in hashcat) at specified intervals. If the outfile has additional lines (i.e. additional hashes have been cracked) hashms sends a notification via SMS and/or Slack and/or Teams. The intent is to reduce the delay between cracking a hash and follow-on operations, as well as the manual effort involved in checking and re-checking ongoing cracking sessions.
 
-hashms uses [Textbelt](https://textbelt.com/) for SMS. An API key is required for SMS, and a [Slack webhook URL](https://api.slack.com/incoming-webhooks) is required for Slack messages. 
+hashms uses [Textbelt](https://textbelt.com/) for SMS. An API key is required for SMS, and a [Slack webhook URL](https://api.slack.com/incoming-webhooks) is required for Slack messages, a 
+[Teams webhook URL](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=newteams%2Cdotnet).
 
 ## Installation
 
-Clone the repositoriy and install the requirements:
+Clone the repositoriy and install with `pipx`:
+```
+pipx install .
+```
 
-    git clone https://github.com/WJDigby/hashms.git
-    pip3 install -r requirements.txt
-    
-The only non-standard library required is [requests](http://docs.python-requests.org/en/master/). The repository includes an example configuration file.
+## Config file
+```conf
+[Textbelt]
+# This is an example and is NOT a valid API key.
+TextbeltAPI = ddYPuc5sKyfbw7kGGD86eZu2ps336dJ33oPjbzEnjfFUHVR000CKJEI0XmpHGN22fg
+PhoneNumber = 1234567890
 
-## Use
+[Slack]
+# This is an example and is NOT a valid Slack webhook.
+SlackURL = https://hooks.slack.com/services/ABCDEFGHI/JKLMNOPQR/STUVWXYZ1234567890ABCDEF
+SlackUser = Steve                     
 
-Run hashms in a screen, tmux, or other terminal session while hashcat is running and provide it the name of your hashcat outfile to monitor. If you are running on a shared machine, or the user running hashms is different than the user running hashcat, make sure hashms has permissions to read the outfile. The hashcat64 process name is hardcoded in hashms.py. 
+[Teams]
+# This is an example and is NOT a valid Teams webhook.
+TeamsURL = https://outlook.office.com/webhook/ABCDEFGHI/JKLMNOPQR/STUVWXYZ1234567890ABCDEF
+TeamsUser = Steve
+```
 
-The Textbelt API and SLack URL values can be set with environmental variables or with a configuration file. Running hashms with command-line parameters -p / --phone-number and/or -s / --slack will look for environmental variables.
+## Usage
 
-    python3 hashms.py -o hashes.outfile -p 5551234567
-    
-Running hashms.py with the configuration file option (-c / --config) will cause it to look for the Textbelt API key, phone number, Slack URL, and Slack username in the configuration file. Configuration files may be useful in situations where a team shares a cracking rig.
+Run hashms in a screen, tmux, or other terminal session while hashcat is running and provide it the name of your hashcat outfile to monitor. If you are running on a shared machine, or the user running hashms is different than the user running hashcat, make sure hashms has permissions to read the outfile. 
 
-Arguments include:
-* -o / --outfile - The location of the hashcat outfile to monitor (mandatory)
-* -i / --interval - Interval in minutes between checks. Default is 15. This is a float value in case the operator wants to check more often than once a minute.
-* -n / --notification-count - How many notifications to send overall. Default is 5. This is useful in case the operator is running a large cracking job and does not want to eat through all of his or her Textbelt quota. 
-* -t / --test - Send a test message to the configured options. Does not count against the notification count, but an SMS will of course count against the Textbelt quota.
-* -c / --config - Use a configuration file. A sample configuration file is included in the repo. If used, hashms expects all notification values to come from the configuration file. This option is mutually exclusive with -p and -s.
-* -p / --phone-number - Phone number to send SMS to. Textbelt API will come from environmental variable.
-* -s / --slack - If enabled, send a slack message. Slack URL will come from environmental variable.
-* -u / --user - Slack user to send the message to (e.g. @user). Useful to get targeted slack notifications.
+```bash
+(hashms-py3.11) root@0339621bd5bc:/workspaces/hashms# hashms 
+usage: hashms [-h] [-o HASHCAT_OUTFILE] [-i CHECK_INTERVAL] [-n NOTIFICATION_COUNT] [--test] [-c CONFIG] [-p PHONE_NUMBER] [-s] [-t] [--procname PROCNAME]
+
+Periodically check hashcat cracking progress and notify of success.
+
+options:
+  -h, --help            show this help message and exit
+  -o HASHCAT_OUTFILE, --outfile HASHCAT_OUTFILE
+                        hashcat outfile to monitor.
+  -i CHECK_INTERVAL, --interval CHECK_INTERVAL
+                        Interval in minutes between checks. Default 15.
+  -n NOTIFICATION_COUNT, --notification-count NOTIFICATION_COUNT
+                        Cease operation after N notifications. Default 5.
+  --test                Send test message via SMS and/or Slack.Does not count against notifications.
+  -c CONFIG, --config CONFIG
+                        Use a configuration file instead of command-line arguments.
+  -p PHONE_NUMBER, --phone PHONE_NUMBER
+                        Phone numer to send SMS to. Format 5551234567.
+  -s, --slack           Send notification to slack channel.
+  -t, --teams           Send notification to teams channel.
+  --procname PROCNAME   Change the binary name of the process to monitor. Default is "hashcat".
+```
 
 ## Examples
+### Config file with 15 minute monitoring
+```bash
+hashms -c ./hashms.conf -o /home/pentester/ntlm2-cracked -i 15
+```
 
-Check the file hashes.out hourly. If additional hashes have been cracked, send a text to (555) 123-4567 and a slack message to the user wjdigby. Send a maximum of 10 notifications:
-
-    python3 hashms.py -o hashes.out -i 60 -n 10 -p 5551234567 -s -u wjdigby
-    
-Check the file hashes.out every 10 minutes. If additional hashes have been cracked, send a Slack message based on the contents of a configuration file (to send only Slack messages when using a configuration file, only fill out the Slack options. Likewise for SMS).
-
-    python3 hashms.py -o hashes.out -i 10 -c hashms.conf
-
-
-
+# Kudos
+Code taken from [WJDigby - hashms project](https://github.com/WJDigby/hashms)
