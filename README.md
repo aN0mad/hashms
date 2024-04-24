@@ -34,7 +34,7 @@ TeamsUser = Steve
 
 Run hashms in a screen, tmux, or other terminal session while hashcat is running and provide it the name of your hashcat outfile to monitor. If you are running on a shared machine, or the user running hashms is different than the user running hashcat, make sure hashms has permissions to read the outfile. 
 
-```bash
+```plain
 (hashms-py3.11) root@0339621bd5bc:/workspaces/hashms# hashms 
 usage: hashms [-h] [-o HASHCAT_OUTFILE] [-i CHECK_INTERVAL] [-n NOTIFICATION_COUNT] [--test] [-c CONFIG] [-p PHONE_NUMBER] [-s] [-t] [--procname PROCNAME]
 
