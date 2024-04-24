@@ -7,7 +7,7 @@ hashms uses [Textbelt](https://textbelt.com/) for SMS. An API key is required fo
 
 ## Installation
 
-Clone the repositoriy and install with `pipx`:
+Clone the repository and install with `pipx`:
 ```
 pipx install .
 ```
